@@ -101,7 +101,7 @@ function node_export_menu() {
  */
 function node_export_access_export($node) {
   global $user;
-  if (is_int($node)) {
+  if (is_numeric($node)) {
     $node = node_load($node);
   }
 
