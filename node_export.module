@@ -38,6 +38,12 @@ function node_export_menu() {
     'description' => 'Configure the settings for Node export.',
     'file' => 'node_export.pages.inc',
   );
+  // Allow other modules to add local task tabs.
+  $items['admin/config/content/node_export/settings'] = array(
+      'title' => 'Settings',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
   $selected_formats = variable_get('node_export_format', array('drupal' => 'drupal'));
   if (count(array_filter($selected_formats)) > 1) {
     $format_handlers = node_export_format_handlers();
