@@ -577,6 +577,7 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
   $messages = array();
   foreach ($nodes as $original_node) {
     $node = node_export_node_clone($original_node);
+    $tnid_to_reset = node_export_node_clone_set_tnid($node, $original_node);
 
     // Import file fields.
     node_export_file_field_import($node, $original_node);
@@ -594,6 +595,7 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
           $node->nid = $nids[$node->uuid];
           $node->is_new = FALSE;
           $node->revision = 1;
+          $tnid_to_reset = 0;
           break;
         case 'skip':
           $save = FALSE;
@@ -605,6 +607,15 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
     drupal_alter('node_export_node_import', $node, $original_node, $save);
 
     if ($save) {
+      if (!empty($tnid_to_reset) && empty($node->tnid)) {
+        node_export_save($node);
+        $node->tnid = $node->nid;
+
+        // Update the tnid map for other nodes referencing this tnid.
+        $tnid_map = &drupal_static('node_export_import_tnid_map', array());
+        $tnid_map[$tnid_to_reset] = $node->tnid;
+      }
+
       node_export_save($node);
       $new_nodes[$node->nid] = $node;
       $messages[] = $msg_t("Imported node !nid: !node", array('!nid' => $node->nid, '!node' => l($node->title, 'node/' . $node->nid)));
@@ -849,6 +860,61 @@ function node_export_node_clone($original_node) {
 
   return $node;
 
+}
+
+/**
+ * Update the tnid value on the new node based on the tnid value from the old node.
+ *
+ * If the original node has a tnid that matches its nid, then we can deduce that this
+ * tnid needs to be changed to match the node's nid (which will only be set after
+ * first saving the node).
+ *
+ * If the original node has a tnid that does not match its nid, we first check to see
+ * if we have already updated the tnid on another node that had this tnid originally.
+ * If so, we will use that tnid.  Otherwise, we leave the tnid specified in the import
+ * unchanged.
+ *
+ * As such, when importing a set of nodes that are all linked via tnid, it is necessary
+ * that the first node where nid = tnid is imported prior to any of the other nodes
+ * that share that tnid.
+ *
+ * @return number
+ *   original tnid if the tnid on this node needs to be set equal to the node's nid
+ *   when it is saved, otherwise NULL
+ */
+function node_export_node_clone_set_tnid(&$node, $original_node) {
+  if (!empty($original_node->tnid)) {
+    $tnid_map = drupal_static('node_export_import_tnid_map', array());
+    if (!empty($tnid_map[$original_node->tnid])) {
+      $node->tnid = $tnid_map[$original_node->tnid];
+    }
+    elseif (!empty($original_node->nid) && $original_node->tnid == $original_node->nid) {
+      $node->tnid = 0;
+      return $original_node->tnid;
+    }
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_node_export_alter().
+ * In case when node translation is enabled we have to ensure that original nodes
+ * appear in export before their translations. This is done to properly assign tnid
+ * to translations, because we don't know until the first node in the set is saved.
+ */
+function node_export_node_export_alter(&$nodes, $format_handler) {
+  if (module_exists('translation')) {
+    $source_nodes = array();
+    foreach ($nodes as $i => $node) {
+      if ($node->nid == $node->tnid) {
+        $source_nodes[] = $node;
+        unset($nodes[$i]);
+      }
+    }
+    if ($source_nodes) {
+      $nodes = array_merge($source_nodes, $nodes);
+    }
+  }
 }
 
 /**
