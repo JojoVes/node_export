@@ -424,7 +424,7 @@ function node_export_prepare_node(&$original_node) {
       }
     }
     if (isset($new_taxonomy['tags']) && count($new_taxonomy['tags'])) {
-      // Comma seperate the tags
+      // Comma separate the tags
       foreach ($new_taxonomy['tags'] as $vid => $tags) {
         $new_taxonomy['tags'][$vid] = implode(', ', $tags);
       }
