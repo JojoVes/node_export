@@ -133,7 +133,7 @@ function node_export_update_7303() {
 
 
 /**
- * Remove/rename vars.
+ * Remove and rename vars.
  */
 function node_export_update_7304() {
   $types = node_type_get_names();
