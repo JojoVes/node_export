@@ -1366,6 +1366,7 @@ if (!function_exists('uuid_set_uuid')) {
       ->fields(array('uuid' => $uuid))
       ->condition($key, $serial_id, '=')
       ->execute();
+    
 
     return $uuid;
   }
