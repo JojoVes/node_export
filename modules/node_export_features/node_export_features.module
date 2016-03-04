@@ -151,8 +151,10 @@ function node_export_features_features_rebuild($module) {
       }
     }
     else {
-      foreach ($result['output'] as $status) {
-        drupal_set_message($status);
+      if (!isset($_GET['profile'])) {
+        foreach ($result['output'] as $status) {
+          drupal_set_message($status);
+        }
       }
     }
   }
