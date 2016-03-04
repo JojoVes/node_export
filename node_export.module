@@ -99,10 +99,10 @@ function node_export_menu() {
 /**
  * Check access to export a node.
  */
-function node_export_access_export($node) {
+function node_export_access_export($node, $reset = FALSE) {
   global $user;
   if (is_numeric($node)) {
-    $node = node_load($node);
+    $node = node_load($node, NULL, $reset);
   }
 
   if (function_exists('drush_main')) {
@@ -320,12 +320,14 @@ function node_export_action_form($context, &$form_state, $format = NULL) {
  *   The format to use for export.
  * @param $msg_t
  *   Function used to translate.
+ * @param $reset
+ *   Whether to reset the node_load_multiple cache.
  * @return
  *   An array with keys 'success' which is a boolean value representing whether
  *   the export was successful and 'output' which contains the code string or an
  *   array of translated error messages to be shown to the user.
  */
-function node_export($nids, $format = NULL, $msg_t = 't') {
+function node_export($nids, $format = NULL, $msg_t = 't', $reset = FALSE) {
   global $user;
 
   // Make $nids an array if it isn't.
@@ -338,9 +340,9 @@ function node_export($nids, $format = NULL, $msg_t = 't') {
 
   $nodes = array();
   foreach ($nids as $nid) {
-    $original_node = node_load($nid);
+    $original_node = node_load($nid, NULL, $reset);
 
-    if (!node_export_access_export($original_node)) {
+    if (!node_export_access_export($original_node, $reset)) {
       // Halt exporting.
       $error = $msg_t("You do not have permission to perform a Node export on one or more of these nodes.  No nodes exported.");
       return array(
