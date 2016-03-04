@@ -585,6 +585,7 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
     node_export_file_field_import($node, $original_node);
 
     // Handle existing nodes.
+    $save_node = $save;
     $nids = entity_get_id_by_uuid('node', array($node->uuid));
     if (!empty($nids[$node->uuid])) {
       $existing = variable_get('node_export_existing', 'new');
@@ -600,15 +601,15 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
           $tnid_to_reset = 0;
           break;
         case 'skip':
-          $save = FALSE;
+          $save_node = FALSE;
           break;
       }
     }
 
     // Let other modules do special fixing up.
-    drupal_alter('node_export_node_import', $node, $original_node, $save);
+    drupal_alter('node_export_node_import', $node, $original_node, $save_node);
 
-    if ($save) {
+    if ($save_node) {
       if (!empty($tnid_to_reset) && empty($node->tnid)) {
         node_export_save($node);
         $node->tnid = $node->nid;
@@ -1366,7 +1367,7 @@ if (!function_exists('uuid_set_uuid')) {
       ->fields(array('uuid' => $uuid))
       ->condition($key, $serial_id, '=')
       ->execute();
-    
+
 
     return $uuid;
   }
