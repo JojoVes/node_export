@@ -27,7 +27,7 @@ function node_export_book_node_export_node_alter(&$node, $original_node) {
     }
     // Dereference the Book ID (BID) and write the book node's UUID
     if (array_key_exists('bid', $original_node->book) and node_load($original_node->book['bid'])) {
-          $node->node_export_book['#book_uuid'] = _node_export_book_nid_to_uuid($original_node->book['bid']);
+      $node->node_export_book['#book_uuid'] = _node_export_book_nid_to_uuid($original_node->book['bid']);
     }
     // Add the weight of this page in the book heirarchy
     if (array_key_exists('weight', $original_node->book)) {
@@ -80,10 +80,10 @@ function node_export_book_node_export_after_import_alter(&$nodes, $format, $save
       $node->book = array();
       $node->book['bid'] = $book_nid;
       $node->book['plid'] = _node_export_book_nid_to_mlid($book_nid);
-      
+
       // Also set up the weight
       $node->book['weight'] = $node->node_export_book['weight'];
-      
+
       // Add this node to the book
       book_node_update($node);
 
@@ -112,11 +112,11 @@ function node_export_book_menu() {
   $items = array();
 
   $items['admin/content/book/node_export_book/%node'] = array(
-    'title'            => 'Export book',
-    'page callback'    => '_node_export_book_run_export',
-    'page arguments'   => array(4),
+    'title' => 'Export book',
+    'page callback' => '_node_export_book_run_export',
+    'page arguments' => array(4),
     'access arguments' => array('export bulk nodes'),
-    'type'             => MENU_CALLBACK,
+    'type' => MENU_CALLBACK,
   );
 
   return $items;
@@ -188,18 +188,25 @@ function _node_export_book_book_admin_overview() {
       'links' => array(
         'edit' => array(
           'title' => t('edit order and titles'),
-          'href'  => 'admin/content/book/' . $book['nid'],
+          'href' => 'admin/content/book/' . $book['nid'],
         ),
         'export' => array(
           'title' => t('export book'),
-          'href'  => 'admin/content/book/node_export_book/' . $book['nid'],
+          'href' => 'admin/content/book/node_export_book/' . $book['nid'],
         ),
       ),
       'attributes' => array('class' => array('links', 'inline')),
     );
 
-    $rows[] = array(l($book['title'], $book['href'], $book['options']), theme('links', $operations));
+    $rows[] = array(
+      l($book['title'], $book['href'], $book['options']),
+      theme('links', $operations)
+    );
   }
 
-  return theme('table', array('header' => $headers, 'rows' => $rows, 'empty' => t('No books available.')));
+  return theme('table', array(
+    'header' => $headers,
+    'rows' => $rows,
+    'empty' => t('No books available.')
+  ));
 }

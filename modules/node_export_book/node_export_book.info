@@ -1,15 +1,10 @@
-name        = Node export book
+name = "Node export book"
 description = "Adds Book support to Node export"
-core        = 7.x
-version     = 7.x-1.x-dev
-
+core = 7.x
 dependencies[] = book
-dependencies[] = node_export (3.x)
-dependencies[] = uuid (1.x)
-
+dependencies[] = node_export
 files[] = node_export_book.module
 files[] = node_export_book_utils.inc
-
 package = "Node export"
 project = node_export
 
