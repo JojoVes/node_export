@@ -630,7 +630,7 @@ function node_export_import($code_string, $msg_t = 't', $save = TRUE) {
     }
   }
 
-  if ($save) {
+  if ($count) {
     drupal_alter('node_export_after_import', $new_nodes, $used_format, $save);
     $messages[] = $msg_t("!count of !total nodes were imported.  Some values may have been reset depending on Node export's configuration.", array('!total' => $total, '!count' => $count));
 
