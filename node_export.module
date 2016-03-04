@@ -263,32 +263,32 @@ function node_export_bulk_operation($nodes = NULL, $format = NULL, $delivery = N
  */
 function node_export_action_info() {
   $actions = array();
-  if (user_access('export nodes')) {
-    $selected_formats = variable_get('node_export_format', array('drupal' => 'drupal'));
-    $format_handlers = node_export_format_handlers();
-    foreach ($format_handlers as $format_handler => $format) {
-      if (in_array($format_handler, $selected_formats)) {
-         // @todo: should formats be able to define their own actions?
-         if (!empty($format['#file']) && is_file($format['#file'])) {
-           require_once $format['#file'];
-         }
-         $format_action = 'node_export_' . $format_handler . '_action';
-         if (function_exists($format_action . '_form')) {
-           $actions[$format_action] = array(
-             'type' => 'node',
-             'label' => t('Node export') . " (" . $format['#title'] . ")",
-             'behavior' => array('changes_property'),
-             // This action only works when invoked through VBO. That's why it's
-             // declared as non-configurable to prevent it from being shown in the
-             // "Create an advanced action" dropdown on admin/config/system/actions.
-             'configurable' => FALSE,
-             'vbo_configurable' => TRUE,
-             'triggers' => array('any'),
-           );
-        }
+
+  $selected_formats = variable_get('node_export_format', array('drupal' => 'drupal'));
+  $format_handlers = node_export_format_handlers();
+  foreach ($format_handlers as $format_handler => $format) {
+    if (in_array($format_handler, $selected_formats)) {
+       // @todo: should formats be able to define their own actions?
+       if (!empty($format['#file']) && is_file($format['#file'])) {
+         require_once $format['#file'];
+       }
+       $format_action = 'node_export_' . $format_handler . '_action';
+       if (function_exists($format_action . '_form')) {
+         $actions[$format_action] = array(
+           'type' => 'node',
+           'label' => t('Node export') . " (" . $format['#title'] . ")",
+           'behavior' => array('changes_property'),
+           // This action only works when invoked through VBO. That's why it's
+           // declared as non-configurable to prevent it from being shown in the
+           // "Create an advanced action" dropdown on admin/config/system/actions.
+           'configurable' => FALSE,
+           'vbo_configurable' => TRUE,
+           'triggers' => array('any'),
+         );
       }
     }
   }
+
   return $actions;
 
 }
