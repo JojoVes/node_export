@@ -1160,6 +1160,13 @@ function node_export_file_field_export(&$entity, $original_entity) {
               // convert file to array to stay into the default node_export_file format
               $file = (object) $file;
 
+              // media field type doesn't load file the whole file on node_load
+              // it loads only fid, title and data associated with file, so in this case we need
+              // to load it by ourselves.
+              if (empty($file->uri) && !empty($file->fid) && $file = file_load($file->fid)) {
+                $field[$language][$i] = (array) $file;
+              }
+
               // Check the file
               if (!isset($file->uri) || !is_file($file->uri)) {
                 drupal_set_message(t("File field found on node, but file doesn't exist on disk? '!path'", array('!path' => $file->uri)), 'error');
