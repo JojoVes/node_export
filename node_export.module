@@ -1227,15 +1227,16 @@ function node_export_file_field_import(&$entity, $original_entity) {
       // fields with different language than the node one.
       foreach($field as $language => $files) {
         if (is_array($files)) {
-          foreach($files as $i => $file) {
+          foreach($files as $i => $field_value) {
 
-            // Convert file to array to stay into the default node_export_file format.
-            $file = (object)$file;
+            $file = (object) $field_value;
 
             $result = _node_export_file_field_import_file($file);
+
             // The file was saved successfully, update the file field (by reference).
             if ($result == TRUE && isset($file->fid)) {
-              $field[$language][$i] = (array)$file;
+              // Retain any special properties from the original field value.
+              $field[$language][$i] = array_merge($field_value, (array) $file);
             }
           }
         }
