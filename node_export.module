@@ -1224,6 +1224,9 @@ function _node_export_file_field_import_file(&$file) {
 
     if (!empty($query)) {
       watchdog('node_export', 'kept existing managed file at uri "%uri"', array('%uri' => $file->uri), WATCHDOG_NOTICE);
+      $file = file_load(array_shift($query));
+    } elseif(isset($file->fid)) {
+      unset($file->fid);
       $file = (object) array_merge((array) $file, (array) file_load(array_shift($query)));
     }
 
@@ -1233,7 +1236,13 @@ function _node_export_file_field_import_file(&$file) {
     $directory = drupal_dirname($file->uri);
     if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
       if (file_put_contents($file->uri, base64_decode($file->node_export_file_data))) {
-        $file = file_save($file);
+        $files = file_load_multiple(array(), array('uri' => $file->uri));
+
+        // Only attempt to save the file if a record doesn't already exist in
+        // the file_managed table.
+        if (count($files) == 0) {
+          $file = file_save($file);
+        }
       }
     }
   }
