@@ -411,7 +411,7 @@ function node_export_prepare_node(&$original_node) {
     node_save($original_node);
   }
 
-  $node = clone($original_node);
+  $node = clone $original_node;
 
   // Fix taxonomy array
   if (isset($node->taxonomy) && count($node->taxonomy)) {
@@ -801,7 +801,7 @@ function node_export_save(&$node) {
 function node_export_node_clone($original_node) {
   global $user;
 
-  $node = clone($original_node);
+  $node = clone $original_node;
 
   $node->nid = NULL;
   $node->vid = NULL;
