@@ -1220,7 +1220,7 @@ function node_export_file_field_export(&$entity, $original_entity) {
  */
 function node_export_file_field_import(&$entity, $original_entity) {
   $entity_info = _node_export_entity_info($entity);
-
+drupal_set_message('got to node_export_file_field_import');
   // Get all fields from this node type.
   $fields = field_info_instances($entity_info['type'], $entity_info['bundle']);
   foreach($fields as $field_instance) {
@@ -1229,19 +1229,24 @@ function node_export_file_field_import(&$entity, $original_entity) {
     $info = field_info_field($field_instance['field_name']);
 
     $supported_fields = array_map('trim', explode(',', variable_get('node_export_file_supported_fields', 'file, image')));
-
+drupal_set_message('the file type is ' . $info['type']);
     // Check if this field should implement file import/export system.
     if (in_array($info['type'], $supported_fields)) {
+drupal_set_message('the file type is supported');
 
       // We need to loop into each language because i18n translation can build
       // fields with different language than the node one.
       foreach($field as $language => $files) {
+drupal_set_message('the language is ' . $language);
         if (is_array($files)) {
+drupal_set_message('the files is an array');
           foreach($files as $i => $field_value) {
 
             $file = (object) $field_value;
 
             $result = _node_export_file_field_import_file($file);
+drupal_set_message('successfully ran _node_export_file_field_import_file ' . $result);
+drupal_set_message('file fid is ' . $file->fid);
 
             // The file was saved successfully, update the file field (by reference).
             if ($result == TRUE && isset($file->fid)) {
