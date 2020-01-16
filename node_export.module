@@ -1311,11 +1311,15 @@ function _node_export_file_field_import_file(&$file) {
     if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
       if (file_put_contents($file->uri, base64_decode($file->node_export_file_data))) {
         $files = file_load_multiple(array(), array('uri' => $file->uri));
-
+drupal_set_message(var_dump($files));
         // Only attempt to save the file if a record doesn't already exist in
         // the file_managed table.
-        if (count($files) == 0) {
+if (count($files) == 0) {
+  drupal_set_message('file before save: ');
+drupal_set_message(var_dump($file));
           $file = file_save($file);
+  drupal_set_message('file after save: ');
+drupal_set_message(var_dump($file));
         }
       }
     }
