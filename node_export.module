@@ -1270,6 +1270,9 @@ drupal_set_message('file fid is ' . $file->fid);
  *   have a valid $file->fid attribute.
  */
 function _node_export_file_field_import_file(&$file) {
+  drupal_set_message('in _node_export_file_field_import_file()');
+  drupal_set_message('file at beginning of function is:');
+  drupal_set_message(var_dump($file));
   // This is here for historical reasons to support older exports.  It can be
   // removed in the next major version.
   $file->uri = strtr($file->uri, array('#FILES_DIRECTORY_PATH#' => 'public:/'));
@@ -1307,10 +1310,13 @@ function _node_export_file_field_import_file(&$file) {
     $file = file_save($file);
   }
   elseif (isset($file->node_export_file_data)) {
+    drupal_set_message('node_export_file_data is ' . $file->node_export_file_data);
     $directory = drupal_dirname($file->uri);
     if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
+      drupal_set_message('prepared directory ' . $directory);
       if (file_put_contents($file->uri, base64_decode($file->node_export_file_data))) {
         $files = file_load_multiple(array(), array('uri' => $file->uri));
+        drupal_set_message('files is: ');
 drupal_set_message(var_dump($files));
         // Only attempt to save the file if a record doesn't already exist in
         // the file_managed table.
